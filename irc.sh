@@ -41,7 +41,7 @@ RAW=$(xwininfo -id $WIN_ID)
 RAW_XPROP=$(xprop -id  $WIN_ID)
 
 # Get current window ID (this is X windows ID)
-XDO_WIN_ID=$(xdotool search $!)
+XDO_WIN_ID=$(xdotool getactivewindow)
 
 # Extract windows information
 # Coordinate in pixels, north west origin
@@ -68,18 +68,15 @@ NL_W=24 # this is entered by hand! might as well be automated, sufficient for me
 NL_H=$HEIGHT
 
 # Create child window
-gnome-terminal --geometry=$NL_W\x$NL_H+$NL_X+$NL_Y -t "Nick List" -e "cat .irssi/nicklistfifo" --working-directory=/home/archayl/ & # also loads nicklist file
+gnome-terminal --geometry=$NL_W\x$NL_H+$NL_X+$NL_Y -t "Nick List" -e "cat .irssi/nicklistfifo" --working-directory=$HOME & # also loads nicklist file
 
 # Write startup items to irssi startup file
-echo "/SCRIPT load nicklist" > .irssi/startup
-echo "/NICKLIST fifo" >> .irssi/startup
-echo "/SET nicklist_width=$NL_W" >> .irssi/startup
-echo "/SET nicklist_height=$NL_H" >> .irssi/startup
-echo "/BIND ^[[5\;3~ command nicklist scroll -$NL_H" >> .irssi/startup
-echo "/BIND ^[[6\;3~ command nicklist scroll +$NL_H" >> .irssi/startup
-
-# Activate parent window which will contain IRSSI
-xdotool windowactivate $XDO_WIN_ID
+echo "/SCRIPT load nicklist" > $HOME/.irssi/startup
+echo "/NICKLIST fifo" >> $HOME/.irssi/startup
+echo "/SET nicklist_width=$NL_W" >> $HOME/.irssi/startup
+echo "/SET nicklist_height=$NL_H" >> $HOME/.irssi/startup
+echo "/BIND ^[[5\;3~ command nicklist scroll -$NL_H" >> $HOME/.irssi/startup
+echo "/BIND ^[[6\;3~ command nicklist scroll +$NL_H" >> $HOME/.irssi/startup
 
 # Wait for startup file fully written
 sleep 2 # might be any value that you think suitable
@@ -92,6 +89,8 @@ xdotool search --name "IRSSI" windowactivate
 
 # Run irssi!
 irssi
+
+exit 0
 
 # When you quit IRSSI, the child window will automatically close
 # Somebody might explain that. I don't know.
